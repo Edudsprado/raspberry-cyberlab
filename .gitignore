@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.coverage
+relatorios*/
+captures/
+capturas/
+*.pcap
+*.pcapng
+*.cap
+.env

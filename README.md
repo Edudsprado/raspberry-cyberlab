@@ -54,7 +54,7 @@ python -m unittest discover -v
 Os CSVs usam vírgula e UTF-8 com BOM. No Excel em português, se necessário importe
 por **Dados → De Texto/CSV**, escolhendo vírgula como delimitador.
 
-## Execução no Kali ou Raspberry Pi OS
+## Execução no Linux (Kali, Debian ou Raspberry Pi OS)
 
 Com Python 3.10+ instalado, copie o projeto e informe o caminho real do PCAP:
 
@@ -68,8 +68,14 @@ python3 -m unittest discover -v
 
 O caminho é um exemplo: na conversa anterior o nome no Raspberry foi digitado como
 `expermiremnto-nmap.pcap`; confirme o nome existente com `ls` antes de executar.
-Não precisa de root. A execução foi testada no Windows; Kali/Raspberry ainda não
-foram executados nesta etapa.
+Não precisa de root. No Windows, os 21 testes passaram, incluindo comparação
+com TShark. No Raspberry Pi 3 com Debian 13 e Python 3.13.5, a saída fornecida
+pelo usuário registra 20 testes aprovados e 1 ignorado por falta do TShark;
+os dois testes de regressão do PCAP real passaram. A saída de execução fornecida
+pelo usuário também registra a geração de JSON e três CSVs sobre o PCAP real,
+com os mesmos totais e SHA-256 observados no Windows. Após receber esses relatórios,
+a comparação direta confirmou os três CSVs idênticos byte por byte; no JSON,
+somente o horário de análise e o nome do PCAP diferem. Kali não foi executado nesta etapa.
 
 Para incluir o teste de regressão do **PCAP real** fora de Downloads:
 
@@ -136,6 +142,9 @@ tentativas inconclusivas. Nenhuma classificação implica estado atual do equipa
 ## Documentação e GitHub
 
 - [Análise real do experimento 01](docs/analise-forense.md)
+- [Relatório acadêmico — identificação a preencher](docs/relatorio-academico.md)
+- [Roteiro de apresentação](docs/apresentacao.md)
+- [Registro complementar do Raspberry e conferência dos PCAPs](docs/registro-experimento-01.md)
 - [Metodologia e formato dos dados](docs/metodologia.md)
 - [Validação executada](docs/validacao.md)
 - [Passos para GitHub](docs/github.md)

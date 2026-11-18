@@ -22,9 +22,44 @@ Em America/Cuiaba (UTC−04), o início equivale a 09:50:50.902836. Esses horár
 são os registrados na captura; não foi verificada a sincronização do relógio de origem.
 
 O SHA-256 calculado coincide com o valor apresentado pelo usuário na conversa
-anterior para o Raspberry e para a cópia no Windows. Esta etapa recalculou o hash
-do arquivo do Windows; **não acessou novamente o Raspberry**.
-O hash não autentica sozinho a origem da captura.
+anterior para o Raspberry e para a cópia no Windows. Na coleta complementar,
+o usuário forneceu uma nova saída de `sha256sum`, com o mesmo hash para
+`/home/cyber/Cyberlab/capturas/expermiremnto-nmap.pcap` no Raspberry. Essa é a
+grafia efetivamente informada no sistema de origem; a cópia do Windows tem o nome
+`experimento-nmap.pcap`. O hash do Windows foi recalculado diretamente nesta
+máquina; a conferência do Raspberry foi recebida por transcrição do usuário,
+sem acesso remoto direto. O hash não autentica sozinho a origem da captura.
+
+## Ambiente informado na coleta complementar
+
+O usuário forneceu transcrições dos comandos de identificação executados no
+Raspberry. Não houve acesso remoto direto nesta etapa. Os dados descrevem o
+ambiente consultado agora; as versões na data da captura não foram confirmadas.
+
+| Item | Valor informado |
+| --- | --- |
+| Equipamento | Raspberry Pi 3 Model B Rev 1.2 |
+| Sistema operacional | Debian GNU/Linux 13 (trixie); DEBIAN_VERSION_FULL=13.7 |
+| Kernel | 6.18.50+rpt-rpi-v8 |
+| Python | 3.13.5 |
+| Nmap | 7.95; plataforma aarch64-unknown-linux-gnu |
+| tcpdump | 4.99.5 |
+| libpcap do tcpdump | 1.10.5, com TPACKET_V3 |
+| OpenSSL do tcpdump | 3.5.7, com data de versão 9 Jun 2026 |
+| Build do tcpdump / time_t | 64 bits / 64 bits |
+
+As transcrições e suas limitações estão no
+[registro complementar](registro-experimento-01.md). A saída de testes fornecida
+pelo usuário para o Raspberry registra 21 testes descobertos: 20 aprovados e
+1 ignorado por ausência do TShark, em 0,518 s. Os dois testes sobre o PCAP real
+passaram. A saída de execução posterior fornecida pelo usuário registra a
+geração de JSON e três CSVs em `relatorios-raspberry-01`, com 2.002 pacotes TCP,
+1 tentativa aberta, 999 fechadas, nenhum pacote ignorado e o mesmo SHA-256
+observado no Windows. A comparação independente com TShark foi executada no Windows.
+Os quatro relatórios foram posteriormente recebidos e comparados diretamente:
+os três CSVs são idênticos byte por byte aos do Windows; no JSON, somente o
+horário da análise e o nome do arquivo de entrada diferem. O
+[registro da comparação](evidencias/comparacao-windows-raspberry.json) documenta os resultados.
 
 ## Resultados das tentativas
 
@@ -78,7 +113,13 @@ Os endpoints loopback sustentam comunicação local ao ambiente de captura. O
 modelo do equipamento e o sistema operacional de origem não são demonstrados
 por esses campos: a atribuição ao Raspberry vem do contexto informado pelo usuário.
 O nome do arquivo e os padrões não provam sozinhos o executável ou o comando Nmap.
-O comando original da varredura ainda deve ser incorporado ao registro experimental.
+Os comandos originais da varredura e da captura não foram recuperados nos
+históricos consultados pelo usuário. O histórico salvo de `cyber` não apresentou
+comandos correspondentes ao PCAP principal, e a consulta a `/root/.bash_history`
+retornou arquivo inexistente. As transcrições foram fornecidas pelo usuário;
+não houve acesso remoto direto nesta etapa. A técnica exata da varredura e a
+interface original permanecem não confirmadas. Consulte o
+[registro complementar](registro-experimento-01.md).
 
 Não foram identificadas evidências de autenticação ou invasão por esta metodologia;
 ela examina o estabelecimento TCP, sem analisar conteúdo de aplicações.

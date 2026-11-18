@@ -3,14 +3,14 @@
 Repositório do projeto:
 **https://github.com/Edudsprado/raspberry-cyberlab**
 
-Criado em 17/11/2026 na conta `Edudsprado`, inicialmente **privado**. A branch
-principal é `main`. Enquanto privado, o professor precisará de uma conta autorizada
-para consultar o código. A visibilidade pode ser alterada no GitHub após a revisão.
+Criado em 17/11/2026 na conta `Edudsprado`. A branch principal é `main`.
+O repositório está público para consulta.
 
 ## Conteúdo enviado
 
 - Código Python do analisador e testes automatizados.
-- README com execução no Windows/Kali, metodologia, relatório forense e roteiro acadêmico.
+- README com diagrama, execução no Windows e no Raspberry e instruções de validação.
+- Atalhos de testes, metodologia, relatório forense e roteiro acadêmico.
 - Seleção textual das evidências reais e log da validação.
 
 O `.gitignore` exclui capturas, relatórios completos, ambientes virtuais e arquivos
@@ -27,9 +27,8 @@ cd raspberry-cyberlab
 python -m unittest discover -v
 ```
 
-No Kali/Raspberry, use `python3` no lugar de `python`. O acesso ao repositório
-privado requer autenticação na conta autorizada. O PCAP não será baixado pelo Git;
-copie a evidência separadamente e confira seu SHA-256.
+No Kali/Raspberry, use `python3` no lugar de `python`. Para reproduzir a análise
+do experimento com o PCAP, use sua cópia local e confira o SHA-256.
 
 ## Enviar futuras alterações
 
@@ -57,5 +56,5 @@ a configuração global do Git. Os commits enviados pelo navegador usam a
 autoria configurada na conta do GitHub.
 
 Autentique pela janela do Git/GitHub quando solicitada; não coloque tokens ou
-senhas no código, na URL ou na documentação. Ainda não foi escolhida uma licença;
-decida os termos de reutilização antes de abrir o código publicamente.
+senhas no código, na URL ou na documentação. A escolha de uma licença para
+reutilização do código segue pendente.

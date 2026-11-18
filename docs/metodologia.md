@@ -42,6 +42,54 @@ para comparar, desative essa opção ou use `tcp.seq_raw` e `tcp.ack_raw` no TSh
 As evidências listam a sequência usada para classificar; não incluem todo o tráfego
 posterior. Para revisar o encerramento, consulte o PCAP e o resumo de fluxos.
 
+## Estados e janela de correlação
+
+| Estado da tentativa | Evidência observada |
+| --- | --- |
+| `aberta` | SYN → SYN/ACK → ACK, com direção e SEQ/ACK compatíveis |
+| `fechada` | SYN → RST/ACK do destino, antes de qualquer SYN/ACK, reconhecendo o SYN |
+| `sem_resposta` | SYN sem resposta correlacionável |
+| `synack_sem_ack` | SYN/ACK compatível sem o ACK final na captura |
+| `reset_apos_synack` | Reset do destino após SYN/ACK |
+| `resposta_ambigua` | Sequências iniciais conflitantes do servidor ou origem e destino indistinguíveis |
+| `abertura_simultanea` | SYNs em sentidos opostos antes de completar o handshake |
+| `nao_suportado_syn_com_dados` | Dados no SYN ou SYN/ACK fora do escopo do classificador |
+
+A janela padrão é de 60 segundos desde o primeiro SYN. Ajuste-a com
+`--window-seconds`. Retransmissões com o mesmo número de sequência inicial
+são agrupadas enquanto a tentativa estiver pendente. Uma sequência inicial
+diferente abre nova tentativa e mantém a anterior no relatório. Depois de uma
+tentativa concluída, outro SYN começa uma nova tentativa mesmo com a mesma
+sequência. Duplicatas completas permanecem na contagem de pacotes.
+
+O resumo de cada porta mostra `aberta` ou `fechada` quando existe ao menos uma
+tentativa daquele tipo, `mista` quando os dois tipos ocorrem e `inconclusiva`
+quando faltam evidências para ambos. Consulte `statuses` e os IDs para ver
+tentativas inconclusivas que coexistem com resultados confirmados. Um RST após
+o handshake pode aparecer em `unmatched_syn_rst_packets`, que conta pacotes de
+controle fora da correlação de abertura e recusa.
+
+## Formatos e limites
+
+- O leitor aceita PCAP clássico 2.4 em little ou big endian, com microssegundos
+  ou nanossegundos, e TCP/IPv4 em Ethernet com VLAN, RAW, NULL/LOOP, Linux
+  SLL/SLL2 ou LINKTYPE_IPV4. Registros acima de 16 MiB são recusados.
+- IPv6, UDP, ARP, fragmentos IP e cabeçalhos incompletos aparecem como pacotes
+  ignorados. A análise trabalha com os cabeçalhos disponíveis e dispensa
+  remontagem e validação de checksum.
+- PCAPNG e formatos de enlace fora da lista são recusados. Para converter uma
+  cópia, use `editcap -F pcap entrada.pcapng convertido.pcap`. Registre os hashes
+  do original e da conversão. Arquivos com várias interfaces podem exigir
+  separação antes da conversão.
+- A correlação segue a ordem do arquivo. Captura parcial, perda, reuso de IPs e
+  portas, espelhamento e respostas forjadas limitam a interpretação.
+  Os timestamps são UTC ou nanossegundos inteiros desde o Unix epoch.
+- `captured_bytes` inclui o cabeçalho de enlace. `tcp_payload_bytes` soma dados
+  TCP observados, incluindo retransmissões. A leitura é incremental e os dados
+  de fluxos e tentativas ficam em memória. A versão prioriza capturas pequenas.
+- O SHA-256 identifica o conteúdo analisado. A origem, a autenticidade e a cadeia
+  de custódia dependem também dos registros da coleta e do manuseio da evidência.
+
 ## Referências primárias
 
 - [RFC 9293 — TCP, handshake e processamento de resets](https://www.rfc-editor.org/rfc/rfc9293.html).
@@ -49,5 +97,4 @@ posterior. Para revisar o encerramento, consulte o PCAP e o resumo de fluxos.
   É um Internet-Draft, não uma RFC publicada.
 - [IETF — tipos de enlace PCAP, draft-ietf-opsawg-pcaplinktype-18](https://datatracker.ietf.org/doc/html/draft-ietf-opsawg-pcaplinktype-18).
 
-O código implementa um subconjunto explícito desses formatos; consulte as
-limitações no README antes de interpretar resultados de outras capturas.
+O código implementa o subconjunto descrito nesta página.

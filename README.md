@@ -1,155 +1,128 @@
-# Raspberry CyberLab — Forensic Analyzer
+# Raspberry CyberLab
 
-Primeira ferramenta acadêmica do Raspberry CyberLab: análise **passiva e local**
-de arquivos PCAP clássicos, com Python 3.10 ou superior e somente biblioteca padrão.
-Versão 0.1.0. Entrega acadêmica prevista para **24/11/2026**.
+**CyberLab Forensic Analyzer 0.1.0** · Projeto acadêmico de redes e segurança · Entrega prevista em **24/11/2026**.
 
-Repositório: [Edudsprado/raspberry-cyberlab](https://github.com/Edudsprado/raspberry-cyberlab).
+[Começar pelo guia rápido](docs/inicio-rapido.md) · [Ver o experimento](docs/analise-forense.md) · [Conferir os testes](docs/testes-automatizados.md)
 
-O analisador calcula SHA-256 dos bytes lidos, resume TCP por IP/porta e correlaciona
-SYN, SYN/ACK, ACK e RST/ACK pela direção, números de sequência e confirmação.
-Gera JSON e três CSVs, preservando o PCAP original.
+## Visão geral
 
-## Primeiro passo: executar no Windows
+O Raspberry CyberLab reúne uma captura feita em laboratório e um analisador Python que lê arquivos PCAP locais. O objetivo é mostrar, pelos pacotes observados, a diferença entre uma conexão TCP estabelecida e uma tentativa que recebeu um reset.
 
-Abra o PowerShell na pasta deste projeto. Não precisa instalar pacotes Python.
+O analisador resume os fluxos por IP e porta, conta as combinações de flags TCP, calcula o SHA-256 do arquivo e exporta relatórios em JSON e CSV. Cada classificação aponta para os números dos pacotes que a sustentam.
+
+## Arquitetura do laboratório
+
+```mermaid
+flowchart LR
+    Raspberry["Raspberry Pi 3<br/>Experimento em loopback"] --> PCAP["PCAP local<br/>Evidência original"]
+    PCAP --> Analyzer["CyberLab Forensic Analyzer<br/>Windows ou Raspberry Pi"]
+    Analyzer --> Reports["Relatórios JSON e CSV<br/>SHA-256, fluxos e tentativas"]
+    PCAP --> Wireshark["Wireshark / TShark<br/>Conferência independente"]
+```
+
+| Etapa | Papel no projeto |
+| --- | --- |
+| Experimento no Raspberry | O tráfego observado na captura usa `127.0.0.1` nos dois sentidos |
+| Análise em Python | Lê TCP/IPv4 no PCAP, correlaciona SYN, SYN/ACK, ACK e RST/ACK e grava os relatórios |
+| Conferência independente | O Wireshark permite inspecionar os pacotes e o TShark compara campos e contagens automaticamente |
+| Validação entre plataformas | Windows e Raspberry analisaram cópias com o mesmo SHA-256 e produziram resultados equivalentes |
+
+O diagrama representa o fluxo da evidência. O registro do experimento descreve o que se sabe sobre os comandos e a interface originais. [Ver o registro](docs/registro-experimento-01.md)
+
+## Tecnologias e ambientes
+
+| Recurso | Uso |
+| --- | --- |
+| Raspberry Pi 3 Model B Rev 1.2 | Equipamento informado para o laboratório e para a execução no Debian 13 com Python 3.13.5 |
+| Python 3.10 ou superior | Leitura, análise e exportação com a biblioteca padrão. Python 3.12.3 usado na validação no Windows |
+| Nmap e tcpdump | Ferramentas associadas à varredura e à coleta do experimento original |
+| Wireshark e TShark | Inspeção manual e comparação automatizada. O TShark é opcional para executar os testes |
+| PowerShell e shell POSIX | Atalhos de teste no Windows e no Raspberry/Linux |
+
+## Estrutura do repositório
+
+| Caminho | Conteúdo |
+| --- | --- |
+| [`cyberlab/`](cyberlab/) | Leitor PCAP, correlacionador TCP e interface de linha de comando |
+| [`tests/`](tests/) | Testes com capturas sintéticas e verificações do PCAP real quando disponível |
+| [`testar.cmd`](testar.cmd) e [`testar.sh`](testar.sh) | Atalhos para executar a suíte de testes |
+| [`scripts/run_tests.py`](scripts/run_tests.py) | Executor compartilhado que salva o log e o resumo em JSON |
+| [`docs/`](docs/) | Guias, metodologia, validação e materiais da apresentação |
+
+## Como executar
+
+**1. Abra o terminal na pasta do projeto.** Use Python 3.10 ou superior. O analisador funciona com a biblioteca padrão e pode ser executado com sua conta normal.
+
+**2. Informe a captura local.** Para o experimento documentado, o valor abaixo verifica o SHA-256 conhecido antes de gerar os relatórios.
+
+No PowerShell do Windows:
 
 ```powershell
-Set-Location "$HOME\OneDrive\Imagens\Documentos\ChatGPT\Cyber"
-python --version
 python -m cyberlab "$HOME\Downloads\experimento-nmap.pcap" --output-dir relatorios-experimento-01 --expect-sha256 ddd44c144ea60620c3fcf4a1e2ef9c7e53ed643b291642f11c896322f6c59a8e
 ```
 
-Se o comando `python` não estiver disponível, use `py -3` em seu lugar.
-Esse hash é específico do experimento 01; para outro PCAP use seu próprio hash ou
-omita `--expect-sha256`. Hash diferente interrompe a execução sem gerar relatórios.
-Uma pasta que já contém relatórios é recusada: use outro nome para cada execução.
+No Raspberry, com a grafia usada no arquivo original:
 
-Saída validada com o arquivo real em 17/11/2026:
-
-```text
-CyberLab 0.1.0 | 2002 pacotes | 2002 TCP
-SHA-256: ddd44c144ea60620c3fcf4a1e2ef9c7e53ed643b291642f11c896322f6c59a8e
-Tentativas: {"aberta": 1, "fechada": 999}
-Pacotes ignorados: 0
+```sh
+python3 -m cyberlab "$HOME/Cyberlab/capturas/expermiremnto-nmap.pcap" --output-dir relatorios-experimento-01 --expect-sha256 ddd44c144ea60620c3fcf4a1e2ef9c7e53ed643b291642f11c896322f6c59a8e
 ```
 
-## Segundo passo: conferir os relatórios
+Para analisar outra captura em PCAP clássico, informe o caminho correspondente e use seu próprio SHA-256 ou omita `--expect-sha256`. Se a pasta de saída já contiver relatórios, escolha outro nome. Para o passo a passo e alternativas no Windows, consulte o [guia rápido](docs/inicio-rapido.md).
 
-Na pasta de saída:
+**3. Abra os relatórios gerados.**
 
-| Arquivo | Conteúdo |
+| Arquivo | O que conferir |
 | --- | --- |
-| `relatorio.json` | Hash, metadados, contagens, limitações, portas, tentativas e evidências numeradas |
-| `portas.csv` | Resumo por IP/porta de destino, classificações e IDs das tentativas |
-| `tentativas.csv` | Cliente/servidor, estado, ISNs e números dos pacotes SYN/SYNACK/ACK/RST |
-| `fluxos-tcp.csv` | Cada direção IP:porta → IP:porta, contagens, bytes, flags e timestamps |
+| `relatorio.json` | SHA-256, contagem de pacotes, tentativas e evidências numeradas |
+| `portas.csv` | Classificação por IP e porta de destino |
+| `tentativas.csv` | Números dos pacotes associados a cada tentativa |
+| `fluxos-tcp.csv` | Tráfego por direção, volumes e combinações de flags |
 
-```powershell
-Import-Csv .\relatorios-experimento-01\portas.csv | Where-Object { $_.server_port -in '22','23' } | Format-Table server_ip,server_port,classification,attempts
-Get-FileHash "$HOME\Downloads\experimento-nmap.pcap" -Algorithm SHA256
-python -m unittest discover -v
-```
+Os CSVs usam vírgula e UTF-8 com BOM. No Excel, use **Dados → De Texto/CSV** se precisar ajustar o delimitador.
 
-Os CSVs usam vírgula e UTF-8 com BOM. No Excel em português, se necessário importe
-por **Dados → De Texto/CSV**, escolhendo vírgula como delimitador.
+## Testes automatizados
 
-## Execução no Linux (Kali, Debian ou Raspberry Pi OS)
+Rode um comando na pasta do projeto:
 
-Com Python 3.10+ instalado, copie o projeto e informe o caminho real do PCAP:
-
-```bash
-cd raspberry-cyberlab
-python3 --version
-python3 -m cyberlab "$HOME/Cyberlab/capturas/experimento-nmap.pcap" --output-dir relatorios-experimento-01
-sha256sum "$HOME/Cyberlab/capturas/experimento-nmap.pcap"
-python3 -m unittest discover -v
-```
-
-O caminho é um exemplo: na conversa anterior o nome no Raspberry foi digitado como
-`expermiremnto-nmap.pcap`; confirme o nome existente com `ls` antes de executar.
-Não precisa de root. No Windows, os 21 testes passaram, incluindo comparação
-com TShark. No Raspberry Pi 3 com Debian 13 e Python 3.13.5, a saída fornecida
-pelo usuário registra 20 testes aprovados e 1 ignorado por falta do TShark;
-os dois testes de regressão do PCAP real passaram. A saída de execução fornecida
-pelo usuário também registra a geração de JSON e três CSVs sobre o PCAP real,
-com os mesmos totais e SHA-256 observados no Windows. Após receber esses relatórios,
-a comparação direta confirmou os três CSVs idênticos byte por byte; no JSON,
-somente o horário de análise e o nome do PCAP diferem. Kali não foi executado nesta etapa.
-
-Para incluir o teste de regressão do **PCAP real** fora de Downloads:
-
-```bash
-CYBERLAB_TEST_PCAP=/caminho/experimento-nmap.pcap python3 -m unittest discover -v
-```
-
-No PowerShell, use `$env:CYBERLAB_TEST_PCAP = 'C:\caminho\experimento-nmap.pcap'`.
-Se o arquivo não estiver disponível, os testes reais são explicitamente ignorados;
-os testes sintéticos continuam. Se TShark estiver disponível, o teste real também
-compara todas as evidências e contagens por fluxo com sua decodificação independente.
-É possível indicar seu executável pela variável `CYBERLAB_TSHARK`.
-
-## Critérios de interpretação
-
-| Estado da tentativa | Evidência exigida |
+| Ambiente | Comando |
 | --- | --- |
-| `aberta` | SYN → SYN/ACK → ACK, mesma tupla invertida na resposta e SEQ/ACK compatíveis |
-| `fechada` | SYN → RST/ACK do destino, reconhecendo o SYN, antes de qualquer SYN/ACK |
-| `sem_resposta` | SYN sem resposta correlacionável; não significa filtrada ou fechada |
-| `synack_sem_ack` | SYN/SYNACK observado, sem completar o handshake na captura |
-| `reset_apos_synack` | Reset do destino após SYN/ACK; não classificado como fechada |
-| `resposta_ambigua` | ISNs conflitantes do servidor ou origem/destino indistinguíveis |
-| `abertura_simultanea` | SYNs nos dois sentidos, fora do classificador desta versão |
-| `nao_suportado_syn_com_dados` | Dados em SYN/SYNACK, fora do classificador desta versão |
+| Windows, no PowerShell | `.\testar.cmd` |
+| Raspberry/Linux | `sh testar.sh` |
 
-A janela padrão é **60 segundos desde o primeiro SYN**, configurável com
-`--window-seconds`. Retransmissões de SYN com o mesmo ISN em uma tentativa pendente
-são agrupadas. Um novo ISN substitui a tentativa ativa daquela tupla; a anterior
-permanece no relatório. Depois de uma tentativa concluída, um novo SYN inicia outra
-tentativa, inclusive com ISN repetido. Duplicatas completas não são removidas.
+O atalho grava `testes.log` e `resultado.json` em `relatorios-testes`. Sem o PCAP do experimento, a suíte roda os casos sintéticos e marca as verificações da captura real como ignoradas. O TShark é usado na comparação independente, que também fica como ignorada quando a ferramenta está ausente.
 
-O resumo de porta apresenta `aberta` ou `fechada` quando há pelo menos uma tentativa
-confirmada desse tipo; `mista` se ambos ocorrerem e `inconclusiva` se nenhum ocorrer.
-Consulte sempre `statuses` e os IDs: um resumo confirmado pode coexistir com
-tentativas inconclusivas. Nenhuma classificação implica estado atual do equipamento.
+| Execuções registradas em 18/11/2026 | Aprovados | Ignorados | Observação |
+| --- | ---: | ---: | --- |
+| Windows | 21 | 0 | Inclui a comparação com TShark |
+| Raspberry Pi | 20 | 1 | Os dois testes com a captura real passaram. A comparação com TShark foi pulada |
 
-## Escopo e limites
+O resultado do Raspberry vem da saída de terminal compartilhada pelo usuário. [Ver a validação dos atalhos](docs/testes-automatizados.md)
 
-- PCAP clássico 2.4, little/big endian, resolução de microssegundos ou nanossegundos.
-- TCP/IPv4 em Ethernet (incluindo VLAN), RAW, NULL/LOOP, Linux SLL/SLL2 ou LINKTYPE_IPV4.
-- IPv6, UDP, ARP, fragmentos IP e cabeçalhos incompletos são contabilizados como
-  ignorados, com motivo. Não há remontagem nem validação de checksum.
-- PCAPNG e enlaces não suportados são recusados. Para converter uma **cópia**:
-  `editcap -F pcap entrada.pcapng convertido.pcap`. A conversão muda os bytes e o
-  hash; preserve o original e registre ambos. Múltiplas interfaces podem exigir
-  separação antes da conversão.
-- Segue a ordem do arquivo; não reordena timestamps. Captura parcial, perda,
-  reuso de tuplas, espelhamento e respostas forjadas limitam a interpretação.
-- Todos os timestamps de relatório são UTC ou nanossegundos desde Unix epoch.
-  Timestamps não são arredondados para `float`.
-- Contagens por fluxo incluem todos os TCP/IPv4 decodificáveis, mesmo sem SYN.
-  `captured_bytes` inclui enlace; `tcp_payload_bytes` conta dados TCP observados,
-  incluindo retransmissões. Registros acima de 16 MiB são recusados.
-- A leitura é incremental; fluxos, tentativas e evidências ficam em memória.
-  Esta primeira versão prioriza capturas pequenas de laboratório.
-- Um RST posterior ao handshake não altera uma tentativa já aberta. Em
-  `unmatched_syn_rst_packets`, esse RST pode aparecer como controle não correlacionado;
-  isso não significa pacote inválido ou ataque.
-- SHA-256 identifica o conteúdo analisado. Não prova sozinho origem, autenticidade,
-  integridade anterior à coleta ou cadeia de custódia. A ferramenta verifica mudanças
-  comuns do arquivo durante a leitura, mas não substitui aquisição forense controlada.
+## Conferência manual do experimento
 
-## Documentação e GitHub
+Abra o PCAP local no Wireshark e filtre por `tcp.port == 22` ou `tcp.port == 23`. Compare os números dos pacotes com `tentativas.csv` e os estados com `portas.csv`.
 
-- [Análise real do experimento 01](docs/analise-forense.md)
-- [Relatório acadêmico — identificação a preencher](docs/relatorio-academico.md)
+| Porta | Pacotes | Sequência observada | Resultado |
+| --- | --- | --- | --- |
+| 22/TCP | 19 → 20 → 21 | SYN → SYN/ACK → ACK | Aberta |
+| 23/TCP | 31 → 32 | SYN → RST/ACK do destino | Fechada |
+
+A captura contém **2.002 pacotes TCP**, **2.000 fluxos direcionais** e **1.000 tentativas**, sendo **1 aberta e 999 fechadas**. Na comparação entre Windows e Raspberry, os três CSVs eram idênticos byte por byte e o JSON diferia no nome da entrada e no horário da análise. [Ver a análise e as evidências](docs/analise-forense.md)
+
+## Como interpretar os resultados
+
+A versão 0.1.0 classifica uma tentativa como aberta quando observa o handshake completo. Um SYN seguido de RST/ACK compatível do destino indica fechamento. Um SYN sem resposta correlacionável ou SYN/ACK sem o ACK final deixa a tentativa inconclusiva. Os estados descrevem a captura e o SHA-256 serve para comparar os bytes de duas cópias.
+
+O escopo é PCAP clássico com TCP/IPv4. Capturas parciais, IPv6, PCAPNG e fragmentos exigem atenção às limitações descritas na [metodologia](docs/metodologia.md). O PCAP e os relatórios completos ficam armazenados à parte.
+
+## Documentação da entrega
+
+- [Relatório acadêmico](docs/relatorio-academico.md)
 - [Roteiro de apresentação](docs/apresentacao.md)
-- [Registro complementar do Raspberry e conferência dos PCAPs](docs/registro-experimento-01.md)
-- [Metodologia e formato dos dados](docs/metodologia.md)
-- [Validação executada](docs/validacao.md)
-- [Passos para GitHub](docs/github.md)
-- [Roteiro até 24/11](docs/roteiro-academico.md)
+- [Registro do experimento e do ambiente do Raspberry](docs/registro-experimento-01.md)
+- [Validação detalhada](docs/validacao.md) e [reexecução no Windows em 18/11](docs/validacao-2026-11-18.md)
+- [Roteiro de entrega](docs/roteiro-academico.md) e [passos para GitHub](docs/github.md)
 
-O PCAP e os relatórios completos ficam fora do Git por padrão. A pasta `docs/evidencias`
-contém apenas um resumo verificável e a extração textual das portas 22/23 para este
-experimento de loopback.
+## Referência de organização
+
+A organização deste README segue a apresentação de laboratório do **Projeto Cyber**, de Eduardo Prado e Pedro Brito, com panorama do projeto, diagrama, estrutura de arquivos e procedimentos de execução e validação. [Consultar o repositório de referência](https://github.com/Petrus123456/projetocyber)

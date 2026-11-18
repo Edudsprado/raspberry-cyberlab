@@ -1,0 +1,30 @@
+Fonte: saída de terminal fornecida pelo usuário nesta conversa; não capturada diretamente pelo agente.
+Comando informado, no diretório /home/cyber/Cyberlab/cyberlab-analyzer-0.1.0:
+CYBERLAB_TEST_PCAP=/home/cyber/Cyberlab/capturas/expermiremnto-nmap.pcap python3 -m unittest discover -v
+
+test_all_classic_magic_variants (tests.test_analyzer.AnalyzerTests.test_all_classic_magic_variants) ... ok
+test_changed_server_isn_is_ambiguous (tests.test_analyzer.AnalyzerTests.test_changed_server_isn_is_ambiguous) ... ok
+test_cli_success_and_bad_hash_no_reports (tests.test_analyzer.AnalyzerTests.test_cli_success_and_bad_hash_no_reports) ... ok
+test_closed_validates_ack_and_direction (tests.test_analyzer.AnalyzerTests.test_closed_validates_ack_and_direction) ... ok
+test_complete_handshake_and_later_client_reset (tests.test_analyzer.AnalyzerTests.test_complete_handshake_and_later_client_reset) ... ok
+test_fast_open_and_simultaneous_open_are_not_classified (tests.test_analyzer.AnalyzerTests.test_fast_open_and_simultaneous_open_are_not_classified) ... ok
+test_hash_and_empty_capture (tests.test_analyzer.AnalyzerTests.test_hash_and_empty_capture) ... ok
+test_invalid_lengths_and_timestamp (tests.test_analyzer.AnalyzerTests.test_invalid_lengths_and_timestamp) ... ok
+test_invalid_or_truncated_container_is_fatal (tests.test_analyzer.AnalyzerTests.test_invalid_or_truncated_container_is_fatal) ... ok
+test_missing_syn_and_missing_ack_are_inconclusive (tests.test_analyzer.AnalyzerTests.test_missing_syn_and_missing_ack_are_inconclusive) ... ok
+test_no_false_closed_or_open_for_wrong_sequence_tuple_or_direction (tests.test_analyzer.AnalyzerTests.test_no_false_closed_or_open_for_wrong_sequence_tuple_or_direction) ... ok
+test_reports_roundtrip_refuse_overwrite_and_preserve_source (tests.test_analyzer.AnalyzerTests.test_reports_roundtrip_refuse_overwrite_and_preserve_source) ... ok
+test_reset_after_synack_does_not_mean_closed (tests.test_analyzer.AnalyzerTests.test_reset_after_synack_does_not_mean_closed) ... ok
+test_retransmission_and_port_reuse (tests.test_analyzer.AnalyzerTests.test_retransmission_and_port_reuse) ... ok
+test_skips_fragments_non_ip_and_malformed_tcp (tests.test_analyzer.AnalyzerTests.test_skips_fragments_non_ip_and_malformed_tcp) ... ok
+test_supported_linktypes_and_vlan (tests.test_analyzer.AnalyzerTests.test_supported_linktypes_and_vlan) ... ok
+test_timeout_and_timestamp_regression (tests.test_analyzer.AnalyzerTests.test_timeout_and_timestamp_regression) ... ok
+test_wraparound_and_ecn_flags (tests.test_analyzer.AnalyzerTests.test_wraparound_and_ecn_flags) ... ok
+test_real_all_evidence_and_directional_flows_match_tshark (tests.test_analyzer.RealCaptureTests.test_real_all_evidence_and_directional_flows_match_tshark) ... skipped 'TShark indisponível para comparação independente'
+test_real_capture_totals (tests.test_analyzer.RealCaptureTests.test_real_capture_totals) ... ok
+test_real_ssh_handshake_and_telnet_reset (tests.test_analyzer.RealCaptureTests.test_real_ssh_handshake_and_telnet_reset) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.518s
+
+OK (skipped=1)

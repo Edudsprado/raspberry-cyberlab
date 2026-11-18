@@ -1,0 +1,7 @@
+Fonte: linhas de portas.csv fornecidas pelo usuário nesta conversa; não lidas diretamente pelo agente no Raspberry.
+Arquivo informado: /home/cyber/Cyberlab/cyberlab-analyzer-0.1.0/relatorios-raspberry-01/portas.csv
+Seleção das portas 22 e 23; marcador BOM omitido nesta transcrição textual:
+
+server_ip,server_port,classification,attempts,statuses,attempt_ids
+127.0.0.1,22,aberta,1,"{""aberta"": 1}",[10]
+127.0.0.1,23,fechada,1,"{""fechada"": 1}",[15]

@@ -125,4 +125,15 @@ O escopo é PCAP clássico com TCP/IPv4. Capturas parciais, IPv6, PCAPNG e fragm
 
 ## Referência de organização
 
-A organização deste README segue a apresentação de laboratório do **Projeto Cyber**, de Eduardo Prado e Pedro Brito, com panorama do projeto, diagrama, estrutura de arquivos e procedimentos de execução e validação. [Consultar o repositório de referência](https://github.com/Petrus123456/projetocyber)
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/edudsprado" title="Perfil Eduardo">
+        <img src="https://avatars.githubusercontent.com/u/203672299?v=4" width="200px;" alt="Eduardo Prado"/><br>
+        <sub>
+          <b>Eduardo Prado</b>
+        <=
+      </a>
+    </td>
+  </tr>
+</table>

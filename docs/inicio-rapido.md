@@ -1,4 +1,4 @@
-# CyberLab Forensic Analyzer — começar aqui
+# CyberLab Forensic Analyzer 
 
 Python 3.10 ou superior, sem instalar pacotes. A ferramenta lê uma captura local,
 resume fluxos e flags TCP, calcula SHA-256 e grava JSON/CSV.

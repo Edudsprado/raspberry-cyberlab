@@ -1,6 +1,5 @@
 # CyberLab Forensic Analyzer — começar aqui
 
-Versão 0.1.0, conferida no Windows em 18/11/2026. Entrega prevista: 24/11/2026.
 Python 3.10 ou superior, sem instalar pacotes. A ferramenta lê uma captura local,
 resume fluxos e flags TCP, calcula SHA-256 e grava JSON/CSV.
 
@@ -95,11 +94,6 @@ evidências da captura real. Os testes do experimento usam o PCAP em Downloads.
 Sem esse arquivo ou sem TShark, os casos correspondentes aparecem como ignorados.
 O programa funciona sem TShark; ele só é usado para comparação independente.
 
-No Windows, o atalho teve 21 testes aprovados. No Raspberry, a execução
-compartilhada pelo usuário teve 20 aprovados e 1 ignorado por falta do TShark.
-Veja os
-[casos verificados dos atalhos](testes-automatizados.md).
-
 No Raspberry ou Linux, use `python3` e informe o caminho real do PCAP.
 A execução desta retomada foi feita no Windows; não foi realizado teste remoto.
 
@@ -116,12 +110,7 @@ serviço executado. A versão lê PCAP clássico e TCP/IPv4; não lê PCAPNG/IPv
 não remonta fragmentos. SHA-256 identifica os bytes; sozinho não prova origem.
 Mais detalhes em [metodologia](metodologia.md) e [validação desta versão](validacao-2026-11-18.md).
 
-## Até a entrega
 
-Primeiro reproduza a execução e confira as portas. Depois prepare a demonstração
-com esses relatórios, mantendo os comandos originais de captura como pendentes
-se não houver registros. Reserve 23/11 para ensaio e cópia offline; entrega em
-24/11/2026. A documentação contém instruções para as etapas seguintes, sem exigir
 que todas sejam feitas agora.
 
 O pacote de entrega contém código, testes e documentação. Capturas e relatórios

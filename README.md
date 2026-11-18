@@ -132,7 +132,7 @@ O escopo é PCAP clássico com TCP/IPv4. Capturas parciais, IPv6, PCAPNG e fragm
         <img src="https://avatars.githubusercontent.com/u/203672299?v=4" width="200px;" alt="Eduardo Prado"/><br>
         <sub>
           <b>Eduardo Prado</b>
-        <=
+        </sub>
       </a>
     </td>
   </tr>

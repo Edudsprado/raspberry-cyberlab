@@ -123,7 +123,7 @@ O escopo é PCAP clássico com TCP/IPv4. Capturas parciais, IPv6, PCAPNG e fragm
 - [Validação detalhada](docs/validacao.md) e [reexecução no Windows em 18/11](docs/validacao-2026-11-18.md)
 - [Roteiro de entrega](docs/roteiro-academico.md) e [passos para GitHub](docs/github.md)
 
-## Referência de organização
+## 👨‍💻 Autores do Projeto
 
 <table>
   <tr>

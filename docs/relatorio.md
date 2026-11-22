@@ -1,14 +1,3 @@
-# Raspberry CyberLab: desenvolvimento e validação de um analisador forense de tráfego TCP
-
-| Campo | Informação |
-| --- | --- |
-| Autor(es) | A preencher |
-| Instituição | A preencher |
-| Curso e disciplina | A preencher |
-| Professor(a) | A preencher |
-| Entrega prevista | 24 de novembro de 2026 |
-| Versão do software | CyberLab Forensic Analyzer 0.1.0 |
-
 ## Resumo
 
 Este trabalho apresenta o desenvolvimento do CyberLab Forensic Analyzer, uma

@@ -9,6 +9,20 @@ O Raspberry CyberLab estuda como os pacotes TCP permitem distinguir uma conexão
 
 O programa lê um arquivo PCAP, resume o tráfego por IP e porta, calcula SHA-256 e gera relatórios em JSON e CSV. Cada classificação aponta os pacotes que a sustentam.
 
+O analisador desenvolvido em Python:
+
+Lê arquivos PCAP locais.
+
+Resume o tráfego TCP por IP e porta.
+
+Identifica padrões de abertura e recusa de conexão.
+
+Registra os números dos pacotes que sustentam cada classificação.
+
+Calcula SHA-256 e gera relatórios em JSON e CSV.
+
+A demonstração utiliza uma captura já coletada no laboratório. Sua execução analisa esse arquivo, sem iniciar uma nova varredura.
+
 ## 2. Arquitetura do laboratório
 
 ### Experimento local
@@ -162,7 +176,7 @@ As classificações descrevem o padrão registrado na captura. Elas não garante
 O analisador reproduziu os resultados do experimento nos ambientes documentados e permitiu relacionar cada classificação aos pacotes correspondentes. A técnica exata da varredura e a interface original permanecem não confirmadas.
 
 ## 9. Organização do repositório
-
+  
 ```text
 raspberry-cyberlab/
 ├── README.md                 # Explicação e roteiro da demonstração

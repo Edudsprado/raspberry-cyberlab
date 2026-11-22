@@ -65,6 +65,16 @@ Um reset enviado depois do handshake não desfaz a evidência de abertura. A jan
 
 Abra o terminal na pasta do repositório. O PCAP deve estar disponível localmente; ele não é distribuído neste repositório.
 
+### Demonstração em um comando no Raspberry
+
+```sh
+sh demonstrar.sh
+```
+
+O script usa o PCAP do experimento 01 no caminho já registrado no Raspberry. Ele executa a suíte de testes, verifica o SHA-256 esperado, gera os quatro relatórios e mostra as portas 22 e 23 no terminal. Cada execução salva os relatórios e o `testes.log` em uma pasta nova, com o caminho informado no final. Se o TShark estiver ausente, o teste de comparação independente é ignorado e a demonstração segue quando os demais passam. Para o mesmo PCAP em outro local, passe o caminho entre aspas como argumento.
+
+### Executar só o analisador
+
 **No Windows, usando PowerShell:**
 
 ```powershell
@@ -157,6 +167,7 @@ O analisador reproduziu os resultados do experimento nos ambientes documentados 
 raspberry-cyberlab/
 ├── README.md                 # Explicação e roteiro da demonstração
 ├── analyzer.py               # Aplicação completa em um único arquivo
+├── demonstrar.sh             # Testes e relatórios em um comando no Raspberry
 ├── tests/
 │   ├── __init__.py
 │   └── test_analyzer.py       # Testes automatizados

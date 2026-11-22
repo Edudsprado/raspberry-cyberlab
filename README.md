@@ -12,17 +12,11 @@ O programa lê um arquivo PCAP, resume o tráfego por IP e porta, calcula SHA-25
 
 ## 2. Arquitetura do laboratório
 
-```mermaid
-flowchart LR
-    Raspberry["Raspberry Pi 3"] --> PCAP["Captura PCAP local"]
-    PCAP --> Python["analyzer.py"]
-    Python --> Reports["JSON e CSV"]
-    PCAP --> Wireshark["Wireshark / TShark"]
-```
+![Diagrama Experimento local no Ilograph, do Raspberry Pi 3 à cópia do PCAP no Windows](docs/arquitetura.png)
 
-O PCAP documentado contém tráfego de loopback: origem e destino são `127.0.0.1`. A análise foi executada no Windows e no Raspberry, e os relatórios foram comparados.
+O PCAP contém 2.002 pacotes TCP em loopback (`127.0.0.1`). O arquivo foi copiado para o Windows via SCP, e o SHA-256 da cópia coincidiu com o do original.
 
-A imagem da arquitetura poderá ser adicionada aqui depois, como `docs/arquitetura.png`, substituindo o diagrama acima.
+Na etapa seguinte, o `analyzer.py` gera relatórios em JSON e CSV a partir do PCAP. O Wireshark e o TShark permitem conferir os pacotes e os resultados.
 
 ## 3. Ferramentas utilizadas
 

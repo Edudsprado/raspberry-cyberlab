@@ -1,8 +1,7 @@
 # Raspberry CyberLab
 
-**CyberLab Forensic Analyzer 0.1.0** — análise de tráfego TCP em Python. Entrega acadêmica prevista: **24/11/2026**.
+**CyberLab Forensic Analyzer 0.1.0** — análise de tráfego TCP em Python.
 
-Este README é o roteiro da apresentação: explicar o objetivo, mostrar a arquitetura, executar o analisador e conferir os resultados. Os nomes dos integrantes serão preenchidos pela equipe.
 
 ## 1. Objetivo do projeto
 

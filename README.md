@@ -169,4 +169,15 @@ raspberry-cyberlab/
 
 O material escrito está no **[relatório acadêmico](docs/relatorio.md)**. A apresentação será conduzida por este README e pela demonstração do programa.
 
-**Repositório:** [Edudsprado/raspberry-cyberlab](https://github.com/Edudsprado/raspberry-cyberlab).
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/edudsprado" title="Perfil Eduardo">
+        <img src="https://avatars.githubusercontent.com/u/203672299?v=4" width="200px;" alt="Eduardo Prado"/><br>
+        <sub>
+          <b>Eduardo Prado</b>
+        </sub>
+      </a>
+    </td>
+  </tr>
+</table>

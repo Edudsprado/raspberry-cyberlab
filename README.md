@@ -167,7 +167,7 @@ raspberry-cyberlab/
 └── .gitattributes            # Padroniza os arquivos de texto
 ```
 
-O material escrito está no **[relatório acadêmico](docs/relatorio.md)**. A apresentação será conduzida por este README e pela demonstração do programa.
+## 10. Autor do repositório
 
 <table>
   <tr>

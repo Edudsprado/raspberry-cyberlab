@@ -263,52 +263,144 @@ Import-Csv .\relatorios-demonstracao\portas.csv | Where-Object { $_.server_port 
 
 ## 7. Testes e validação
 
-Os testes estão separados da aplicação em **[tests/test_analyzer.py](tests/test_analyzer.py)**. Eles verificam sequências TCP, respostas incorretas, retransmissões, arquivos inválidos, integridade e exportação, além do PCAP real quando disponível.
+A validação reúne os testes automatizados do programa e a comparação dos resultados obtidos nos experimentos.
 
-**Windows:**
+### Testes automatizados
+
+Os testes estão em **[tests/test_analyzer.py](tests/test_analyzer.py)** e verificam:
+
+- Handshakes completos e recusas de conexão.
+- Respostas incompatíveis, retransmissões e sequências incompletas.
+- Arquivos inválidos ou truncados.
+- Cálculo de SHA-256 e geração dos relatórios.
+- Resultados esperados da captura original.
+- Comparação independente com TShark, quando disponível.
+
+Execute os comandos na pasta do repositório.
+
+**Windows / PowerShell:**
 
 ```powershell
+$env:CYBERLAB_TEST_PCAP = "$HOME\Downloads\experimento-nmap.pcap"
 python -m unittest discover -v
 ```
 
-**Raspberry/Linux, indicando a captura do experimento:**
+**Raspberry / Linux:**
 
 ```bash
 CYBERLAB_TEST_PCAP="$HOME/Cyberlab/capturas/expermiremnto-nmap.pcap" python3 -m unittest discover -v
 ```
 
+Os testes reais foram preparados para a **captura original do experimento 01**. Não se deve substituir esse arquivo por uma nova captura e esperar as mesmas contagens.
+
 | Validação registrada | Aprovados | Ignorados |
 | --- | ---: | ---: |
-| Windows, com PCAP real e TShark | 21 | 0 |
-| Raspberry, conforme saídas fornecidas pelo usuário | 20 | 1, por ausência do TShark |
+| Windows, com PCAP original e TShark | 21 | 0 |
+| Raspberry, com PCAP original e sem TShark | 20 | 1 |
 
-Na comparação direta dos relatórios recebidos do Raspberry, os três CSVs eram **idênticos byte por byte** aos do Windows. No JSON, somente o horário da análise e o nome do arquivo de entrada diferiam.
+Na comparação anterior dos relatórios do Windows e do Raspberry, os três CSVs foram **idênticos byte por byte**. No JSON, diferiram apenas o horário da análise e o nome do arquivo de entrada.
 
-Sem o PCAP, os testes reais são ignorados. Sem TShark, a comparação independente é ignorada. Confira a linha final dos testes para distinguir verificações aprovadas de verificações não executadas.
+Sem a captura disponível, os testes reais são ignorados. Sem TShark, a comparação independente é ignorada. Um teste ignorado não conta como aprovado.
+
+### Validação do experimento pela Wi-Fi
+
+Um segundo experimento utilizou o Raspberry para realizar uma varredura autorizada do notebook conectado ao mesmo hotspot.
+
+O tráfego foi capturado pela interface `wlan0` e analisado com `analyzer.py`.
+
+| Resultado | Nmap | CyberLab |
+| --- | --- | --- |
+| Portas abertas | 135, 139 e 445 | 135, 139 e 445 |
+| Fechadas | 997 portas | 997 tentativas |
+
+A captura continha **2.361 pacotes TCP**, sem pacotes ignorados pelo analisador.
+
+O CyberLab também identificou uma tentativa sem resposta correlacionada para a porta 543. Essa ocorrência não foi investigada em profundidade. Portanto, a comparação confirma a concordância das portas abertas, sem estabelecer equivalência completa entre todas as tentativas e as classificações do Nmap.
+
+Essa análise foi executada diretamente com `analyzer.py`. O `demonstrar.sh` permanece destinado à validação da captura original.
 
 ## 8. Limitações e conclusão
 
-A primeira versão lê **PCAP clássico e TCP/IPv4**. Ela não lê PCAPNG/IPv6, não remonta fragmentos e não valida checksums ou autenticações de aplicação.
+A versão 0.1.0 oferece suporte a **PCAP clássico e TCP/IPv4**. Ela não lê PCAPNG ou IPv6, não remonta fragmentos e não valida checksums ou autenticações de aplicação.
 
-As classificações descrevem o padrão registrado na captura. Elas não garantem o estado atual de uma porta nem identificam, sozinhas, o serviço executado. O handshake da porta 22 não comprova login SSH ou invasão. SHA-256 identifica o conteúdo, mas não prova sozinho sua origem.
+As classificações descrevem os padrões registrados na captura:
 
-O analisador reproduziu os resultados do experimento nos ambientes documentados e permitiu relacionar cada classificação aos pacotes correspondentes. A técnica exata da varredura e a interface original permanecem não confirmadas.
+- Um handshake completo evidencia uma conexão estabelecida.
+- Um RST/ACK compatível em resposta ao SYN evidencia uma tentativa recusada.
+- A ausência de resposta correlacionada não comprova, isoladamente, bloqueio por firewall.
+
+Os resultados não garantem o estado atual das portas nem identificam, sozinhos, os serviços executados. Uma conexão na porta 22 não comprova login SSH. Os nomes de serviços apresentados pelo Nmap na varredura realizada são associações às portas, sem confirmação de versões.
+
+O SHA-256 permite comparar o conteúdo dos arquivos e detectar alterações, mas não comprova sozinho sua origem.
+
+O projeto foi aplicado em dois cenários:
+
+| Experimento | Escopo |
+| --- | --- |
+| Captura original | Tráfego local em `127.0.0.1`, validado no Windows e no Raspberry |
+| Captura pela Wi-Fi | Varredura TCP Connect do notebook pelo hotspot, com captura na `wlan0` |
+
+Foi recuperado um registro de execução do Nmap relacionado ao experimento local, mas sua correspondência exata com a captura original não foi comprovada. O comando de captura original também permanece não confirmado. No experimento pela Wi-Fi, os comandos e a interface utilizados foram registrados durante a execução.
+
+A contribuição acadêmica consiste em implementar a correlação dos pacotes TCP, apresentar evidências para as classificações e comparar os resultados com ferramentas existentes.
 
 ## 9. Organização do repositório
-  
+
+### Arquivos disponíveis no GitHub
+
 ```text
 raspberry-cyberlab/
 ├── README.md                 # Explicação e roteiro da demonstração
-├── analyzer.py               # Aplicação completa em um único arquivo
-├── demonstrar.sh             # Testes e relatórios em um comando no Raspberry
+├── analyzer.py               # Analisador completo
+├── demonstrar.sh             # Demonstração automatizada do experimento original
 ├── tests/
 │   ├── __init__.py
 │   └── test_analyzer.py       # Testes automatizados
 ├── docs/
-│   └── relatorio.md          # Relatório acadêmico e registros essenciais
-├── .gitignore                # Mantém capturas, relatórios e backups fora do Git
-└── .gitattributes            # Padroniza os arquivos de texto
+│   ├── relatorio.md          # Relatório acadêmico
+│   ├── arquitetura.png
+│   ├── investigacao-forense.png
+│   └── testes-e-validacao.png
+├── .gitignore                # Exclui capturas, resultados e caches do Git
+└── .gitattributes            # Padroniza as terminações de linha
 ```
+
+### Dados locais no Raspberry
+
+As capturas e os resultados ficam separados do código distribuído no GitHub.
+
+```text
+/home/cyber/Cyberlab/
+├── capturas/
+│   ├── expermiremnto-nmap.pcap
+│   ├── teste-inicial.pcap
+│   └── wlan.1nBw2Q/
+│       ├── captura.pcap
+│       └── relatorios/
+│           ├── relatorio.json
+│           ├── portas.csv
+│           ├── tentativas.csv
+│           └── fluxos-tcp.csv
+├── evidencias/
+│   └── SHA256SUMS.txt
+├── relatorios/
+│   ├── ambiento01.txt
+│   └── nmap-local.txt
+└── raspberry-cyberlab/
+    ├── analyzer.py
+    ├── demonstrar.sh
+    ├── tests/
+    ├── docs/
+    └── relatorios-demonstracao.XXXXXX/
+```
+
+A pasta `relatorios` também pode reunir os quatro relatórios da primeira validação, após a transferência da antiga pasta `relatorios-raspberry-01`.
+
+Cada nova coleta cria uma pasta própria em `capturas`. Cada execução do `demonstrar.sh` cria uma pasta de resultados dentro do repositório local. Os nomes com sufixo variável distinguem as execuções e preservam os arquivos anteriores.
+
+O `SHA256SUMS.txt` existente registra os arquivos do experimento original; a nova captura possui seu hash registrado no respectivo `relatorio.json`.
+
+As capturas, os relatórios gerados e os logs locais não são baixados pelo `git clone`.
 
 ## 10. Autor do repositório
 

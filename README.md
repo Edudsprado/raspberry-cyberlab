@@ -11,15 +11,11 @@ O programa lê um arquivo PCAP, resume o tráfego por IP e porta, calcula SHA-25
 
 O analisador desenvolvido em Python:
 
-Lê arquivos PCAP locais.
-
-Resume o tráfego TCP por IP e porta.
-
-Identifica padrões de abertura e recusa de conexão.
-
-Registra os números dos pacotes que sustentam cada classificação.
-
-Calcula SHA-256 e gera relatórios em JSON e CSV.
+- Lê arquivos PCAP locais.
+- Resume o tráfego TCP por IP e porta.
+- Identifica padrões de abertura e recusa de conexão.
+- Registra os números dos pacotes que sustentam cada classificação.
+- Calcula SHA-256 e gera relatórios em JSON e CSV.
 
 A demonstração utiliza uma captura já coletada no laboratório. Sua execução analisa esse arquivo, sem iniciar uma nova varredura.
 

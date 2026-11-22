@@ -73,53 +73,176 @@ Um reset enviado depois do handshake não desfaz a evidência de abertura. A jan
 
 ## 5. Demonstração prática
 
-Abra o terminal na pasta do repositório. O PCAP deve estar disponível localmente; ele não é distribuído neste repositório.
+Nesta demonstração, o Raspberry executa uma varredura autorizada do notebook conectado ao mesmo hotspot. O tráfego é capturado e depois examinado pelo **CyberLab Forensic Analyzer**.
 
-### Demonstração em um comando no Raspberry
+| Ferramenta | Função |
+| --- | --- |
+| Nmap | Executar a varredura de portas |
+| tcpdump | Registrar os pacotes em um arquivo PCAP |
+| `analyzer.py` | Analisar o PCAP, calcular SHA-256 e gerar relatórios |
 
-```sh
-sh demonstrar.sh
-```
+### 5.1. Conferir a rede
 
-O script usa o PCAP do experimento 01 no caminho já registrado no Raspberry. Ele executa a suíte de testes, verifica o SHA-256 esperado, gera os quatro relatórios e mostra as portas 22 e 23 no terminal. Cada execução salva os relatórios e o `testes.log` em uma pasta nova, com o caminho informado no final. Se o TShark estiver ausente, o teste de comparação independente é ignorado e a demonstração segue quando os demais passam. Para o mesmo PCAP em outro local, passe o caminho entre aspas como argumento.
-
-### Executar só o analisador
-
-**No Windows, usando PowerShell:**
-
-```powershell
-python analyzer.py "$HOME\Downloads\experimento-nmap.pcap" --output-dir relatorios-demonstracao --expect-sha256 ddd44c144ea60620c3fcf4a1e2ef9c7e53ed643b291642f11c896322f6c59a8e
-```
-
-Se `python` não estiver disponível, use `py -3` no lugar dele.
-
-**No Raspberry/Linux, usando o nome confirmado no equipamento:**
+No Raspberry, execute:
 
 ```bash
-python3 analyzer.py "$HOME/Cyberlab/capturas/expermiremnto-nmap.pcap" --output-dir relatorios-demonstracao --expect-sha256 ddd44c144ea60620c3fcf4a1e2ef9c7e53ed643b291642f11c896322f6c59a8e
+ip -br addr
+ip route
 ```
 
-O hash acima é específico do experimento 01. Para outra captura, use o caminho e o hash correspondentes ou omita `--expect-sha256`. Em uma nova execução, escolha outra pasta de saída se ela já contiver relatórios.
+No experimento realizado, os endereços eram:
 
-### Saída do experimento validado
+| Recurso | Endereço |
+| --- | --- |
+| Interface do Raspberry | `wlan0` |
+| Raspberry | `10.159.233.58` |
+| Notebook autorizado | `10.159.233.136` |
+| Rede do hotspot | `10.159.233.0/24` |
+
+Os endereços podem mudar após uma reconexão. Antes de repetir o experimento, confirme o IP do notebook e substitua-o nos comandos de captura e varredura.
+
+### 5.2. Iniciar a captura
+
+No primeiro terminal do Raspberry, crie uma pasta exclusiva para a execução:
+
+```bash
+execucao=$(mktemp -d "$HOME/Cyberlab/capturas/wlan.XXXXXX")
+```
+
+Inicie a captura do tráfego TCP envolvendo o notebook:
+
+```bash
+sudo tcpdump -i wlan0 -nn -s 0 -U -w "$execucao/captura.pcap" 'tcp and host 10.159.233.136'
+```
+
+Mantenha esse terminal aberto e capturando.
+
+### 5.3. Executar a varredura
+
+Em um **segundo terminal conectado ao Raspberry**, execute:
+
+```bash
+nmap -sT -Pn -p 1-1000 --reason 10.159.233.136
+```
+
+O comando realiza uma varredura TCP Connect das portas 1 a 1000 do notebook e apresenta o motivo de cada classificação.
+
+Quando o Nmap terminar, volte ao primeiro terminal e pressione **Ctrl+C** para encerrar a captura.
+
+### 5.4. Executar o analisador forense
+
+No **primeiro terminal**, onde a variável `execucao` foi criada, execute:
+
+```bash
+python3 "$HOME/Cyberlab/raspberry-cyberlab/analyzer.py" "$execucao/captura.pcap" --output-dir "$execucao/relatorios"
+```
+
+É nesta etapa que atua a ferramenta desenvolvida no projeto. Ela:
+
+1. Lê os pacotes do PCAP.
+2. Calcula o SHA-256 da captura.
+3. Correlaciona as tentativas TCP.
+4. Identifica padrões de conexão estabelecida, recusa e ausência de resposta correlacionada.
+5. Gera relatórios com referências aos pacotes de evidência.
+
+O analisador examina os IPs e portas presentes na captura. Não é necessário editar seu código para cada alvo.
+
+### 5.5. Mostrar as portas abertas
+
+Ainda no primeiro terminal, execute:
+
+```bash
+python3 -c 'import csv,sys; f=open(sys.argv[1], encoding="utf-8-sig", newline=""); print("IP | PORTA | CLASSIFICAÇÃO"); [print(r["server_ip"], r["server_port"], r["classification"], sep=" | ") for r in csv.DictReader(f) if r["classification"] == "aberta"]' "$execucao/relatorios/portas.csv"
+```
+
+Compare essa saída com as portas abertas informadas pelo Nmap.
+
+Os resultados de uma nova execução dependem dos serviços ativos, das regras de firewall e das condições da rede naquele momento.
+
+### 5.6. Resultados do experimento realizado
+
+O Nmap apresentou:
 
 ```text
-CyberLab 0.1.0 | 2002 pacotes | 2002 TCP
-SHA-256: ddd44c144ea60620c3fcf4a1e2ef9c7e53ed643b291642f11c896322f6c59a8e
-Tentativas: {"aberta": 1, "fechada": 999}
+Not shown: 997 closed tcp ports (conn-refused)
+
+PORT    STATE SERVICE      REASON
+135/tcp open  msrpc        syn-ack
+139/tcp open  netbios-ssn  syn-ack
+445/tcp open  microsoft-ds syn-ack
+```
+
+O CyberLab apresentou:
+
+```text
+CyberLab 0.1.0 | 2361 pacotes | 2361 TCP
+SHA-256: 2753499a843d338d8932897adf4fc02c9d3b88a67242ce28ba3178a42f2afea8
+Tentativas: {"aberta": 3, "fechada": 997, "sem_resposta": 1}
 Pacotes ignorados: 0
 ```
 
-### Arquivos gerados
+A comparação das portas abertas foi:
 
-| Arquivo | O que mostrar na apresentação |
+| Porta | Nmap | CyberLab |
+| --- | --- | --- |
+| 135/TCP | Aberta | Aberta |
+| 139/TCP | Aberta | Aberta |
+| 445/TCP | Aberta | Aberta |
+
+As três portas abertas coincidiram. O Nmap informou 997 portas fechadas, enquanto o analisador registrou 997 tentativas fechadas.
+
+O analisador também registrou uma tentativa sem resposta correlacionada para a porta 543. Por isso, o total de tentativas não deve ser tratado como uma contagem de portas distintas. Essa ocorrência não foi investigada em profundidade.
+
+Os nomes de serviços exibidos pelo Nmap são associações às portas; a execução não confirmou versões nem demonstrou vulnerabilidades.
+
+### 5.7. Consultar os arquivos gerados
+
+Para mostrar o caminho da execução:
+
+```bash
+printf '%s\n' "$execucao"
+```
+
+Cada execução produz:
+
+```text
+wlan.XXXXXX/
+├── captura.pcap
+└── relatorios/
+    ├── relatorio.json
+    ├── portas.csv
+    ├── tentativas.csv
+    └── fluxos-tcp.csv
+```
+
+| Arquivo | Conteúdo |
 | --- | --- |
-| `relatorio.json` | SHA-256, metadados e evidências numeradas |
-| `portas.csv` | IP/porta de destino e classificação |
-| `tentativas.csv` | Os pacotes SYN, SYN/ACK, ACK e RST de cada tentativa |
-| `fluxos-tcp.csv` | Contagem de pacotes, bytes e flags por direção |
+| `captura.pcap` | Pacotes registrados durante o experimento |
+| `relatorio.json` | Hash, metadados, classificações e referências de evidência |
+| `portas.csv` | Resumo por IP e porta |
+| `tentativas.csv` | Tentativas e pacotes associados |
+| `fluxos-tcp.csv` | Contagens de pacotes, bytes e flags por direção |
 
-Os CSVs usam vírgula e UTF-8 com BOM. No Excel, use **Dados → De Texto/CSV** se precisar ajustar o delimitador.
+No experimento documentado, os arquivos foram salvos em:
+
+```text
+/home/cyber/Cyberlab/capturas/wlan.1nBw2Q/
+```
+
+Uma nova captura terá seu próprio conteúdo, SHA-256 e resultados.
+
+### 5.8. Demonstração automatizada do experimento original
+
+O repositório também possui um script para repetir a validação da captura original de loopback:
+
+```bash
+cd "$HOME/Cyberlab/raspberry-cyberlab"
+sh demonstrar.sh
+```
+
+Esse script executa os testes, confere o hash esperado, analisa o PCAP original e mostra as portas 22 e 23. Os relatórios e o log são salvos em uma pasta `relatorios-demonstracao.XXXXXX`.
+
+**O `demonstrar.sh` atual não realiza uma nova varredura nem captura tráfego pela Wi-Fi.** Seu PCAP, hash esperado e filtro de exibição são específicos do experimento original. A demonstração com o notebook utiliza as etapas de coleta e análise descritas acima.
 
 ## 6. Resultados e conferência no Wireshark
 

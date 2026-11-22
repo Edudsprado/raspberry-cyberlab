@@ -210,9 +210,67 @@ draft-ietf-opsawg-pcap-09, 2026. Internet-Draft.
 Disponível em: https://datatracker.ietf.org/doc/draft-ietf-opsawg-pcap/09/.
 
 [3] RASPBERRY CYBERLAB. **Registros de validação e comparação de relatórios**.
-Artefatos do projeto: [validação](validacao.md),
-[análise forense](analise-forense.md),
-[registro complementar](registro-experimento-01.md) e
-[comparação Windows/Raspberry](evidencias/comparacao-windows-raspberry.json).
+Resultados sintetizados no Apêndice A deste relatório. Logs e documentos
+anteriores preservados em backup local, fora do conteúdo publicado.
 
-**Código-fonte:** https://github.com/Edudsprado/raspberry-cyberlab
+**Código-fonte:** [Raspberry CyberLab](https://github.com/Edudsprado/raspberry-cyberlab).
+
+## Apêndice A — Rastreabilidade e organização
+
+### Origem dos registros
+
+- Windows: leitura direta do PCAP, testes e comparação independente com TShark.
+- Raspberry: identificação do ambiente, hash do PCAP e saídas de execução
+  fornecidos pelo usuário por transcrição de terminal.
+- Relatórios do Raspberry: quatro arquivos recebidos no Windows e inspecionados
+  diretamente, preservando a distinção entre transcrições e arquivos recebidos.
+
+O nome no Windows é `experimento-nmap.pcap`; o nome informado no Raspberry é
+`/home/cyber/Cyberlab/capturas/expermiremnto-nmap.pcap`. Os hashes coincidem.
+O arquivo `teste-inicial.pcap` tem outro hash e não foi usado para atribuir
+comandos ou interface à captura principal.
+
+### Comparação direta de arquivos
+
+| CSV | Linhas de dados | SHA-256, coincidente entre Windows e arquivo recebido |
+| --- | ---: | --- |
+| portas.csv | 1.000 | 2764e677ae76846d1bb4dd2d3d48edc09a3938bdb8bf7f50148e677e6d0e3639 |
+| tentativas.csv | 1.000 | 3bd5804b389a0f4e1cba843756f20705b1abd99c1effce1155908ae4048ad4c1 |
+| fluxos-tcp.csv | 2.000 | 224b1452b816595634305e49d2f534962292e1d6a244da3efaac31d4944e3ae9 |
+
+No JSON, somente `source.name` e `analyzed_at_utc` diferem. A execução Windows
+registrou `2026-11-17T15:27:06.685762+00:00`; a execução Raspberry,
+`2026-11-17T16:06:16.800098+00:00`. As evidências, parâmetros, contagens,
+classificações e timestamps dos pacotes coincidem.
+
+### Interpretação de estados
+
+`sem_resposta` e `synack_sem_ack` preservam tentativas incompletas.
+`reset_apos_synack`, `resposta_ambigua`, `abertura_simultanea` e
+`nao_suportado_syn_com_dados` recebem tratamento separado do padrão aberto/fechado.
+O resumo de uma porta é `mista` se houver tentativas abertas e fechadas e
+`inconclusiva` quando não houver nenhuma tentativa confirmada desses dois tipos.
+
+### Organização simplificada
+
+A aplicação foi reunida em `analyzer.py`, na raiz do repositório, mantendo a
+lógica de análise. Os testes continuam em `tests/test_analyzer.py`.
+O README reúne a execução, os resultados e o roteiro da demonstração.
+Não há arquivo de apresentação separado. Os documentos e logs anteriores foram
+preservados em um backup local antes da reorganização.
+
+A suíte de testes deve ser executada com `python -m unittest discover -v`
+(ou `python3` no Raspberry). Para analisar uma captura, use `python analyzer.py`
+seguido do caminho do PCAP e das opções documentadas no README.
+
+### Verificação após a simplificação — 21/11/2026
+
+A aplicação em arquivo único foi executada diretamente no Windows sobre o PCAP
+real com o SHA-256 esperado. Os 21 testes passaram, incluindo a comparação
+independente com TShark. Os três CSVs gerados foram idênticos byte por byte aos
+relatórios Windows anteriores. Todos os valores do JSON coincidiram após excluir
+somente `analyzed_at_utc`, que identifica uma nova execução.
+
+A nova estrutura e o novo comando `python3 analyzer.py` ainda não foram
+reexecutados no Raspberry. A validação anterior nesse equipamento refere-se à
+estrutura distribuída naquele momento, com a mesma lógica de análise.

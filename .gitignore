@@ -13,3 +13,4 @@ capturas/
 *.pcapng
 *.cap
 .env
+backup-organizacao/

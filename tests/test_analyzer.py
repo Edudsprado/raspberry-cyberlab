@@ -14,7 +14,7 @@ import tempfile
 import unittest
 from collections import Counter
 
-from cyberlab.analyzer import AnalysisError, analyze, flags_text, main, write_reports
+from analyzer import AnalysisError, analyze, flags_text, main, write_reports
 
 
 def tcp(sport=45000, dport=22, seq=100, ack=0, flags=2,

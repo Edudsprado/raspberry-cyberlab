@@ -17,7 +17,7 @@ from pathlib import Path
 import struct
 import sys
 
-from . import __version__
+__version__ = "0.1.0"
 
 SYN, ACK, RST, FIN = 2, 16, 4, 1
 MASK32 = 0xFFFFFFFF
@@ -413,3 +413,7 @@ def main(argv=None):
     for path in paths:
         print(f"Relatório: {path}")
     return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

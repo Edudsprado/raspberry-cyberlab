@@ -277,30 +277,63 @@ Os testes estão em **[tests/test_analyzer.py](tests/test_analyzer.py)** e verif
 
 Execute os comandos na pasta do repositório.
 
-**Windows / PowerShell:**
+## 7. Conferência no Wireshark
+
+Após concluir a etapa 5, transfira o PCAP gerado para o notebook e confira as evidências no Wireshark.
+
+### 7.1. Copiar a captura
+
+No **PowerShell do notebook**, informe a pasta da execução:
 
 ```powershell
-$env:CYBERLAB_TEST_PCAP = "$HOME\Downloads\experimento-nmap.pcap"
-python -m unittest discover -v
+$pasta = "wlan.oEVHg4"
 ```
 
-**Raspberry / Linux:**
+**Substitua `"wlan.oEVHg4"` pelo nome gerado na etapa 5.**
 
-```bash
-CYBERLAB_TEST_PCAP="$HOME/Cyberlab/capturas/expermiremnto-nmap.pcap" python3 -m unittest discover -v
+Depois execute:
+
+```powershell
+scp "cyber@10.159.233.58:/home/cyber/Cyberlab/capturas/$pasta/captura.pcap" "$HOME\Downloads\cyberlab-wlan.pcap"
 ```
 
-Os testes reais foram preparados para a **captura original do experimento 01**. Não se deve substituir esse arquivo por uma nova captura e esperar as mesmas contagens.
+Digite a senha do Raspberry. Se o IP dele mudar, substitua também `10.159.233.58`.
 
-| Validação registrada | Aprovados | Ignorados |
-| --- | ---: | ---: |
-| Windows, com PCAP original e TShark | 21 | 0 |
-| Raspberry, com PCAP original e sem TShark | 20 | 1 |
+### 7.2. Conferir o hash
 
-Na comparação anterior dos relatórios do Windows e do Raspberry, os três CSVs foram **idênticos byte por byte**. No JSON, diferiram apenas o horário da análise e o nome do arquivo de entrada.
+```powershell
+Get-FileHash "$HOME\Downloads\cyberlab-wlan.pcap" -Algorithm SHA256
+```
 
-Sem a captura disponível, os testes reais são ignorados. Sem TShark, a comparação independente é ignorada. Um teste ignorado não conta como aprovado.
+Compare o resultado com o SHA-256 apresentado pelo analisador na etapa 5. **Os valores devem coincidir.** Letras maiúsculas ou minúsculas não alteram a comparação.
 
+Uma nova captura normalmente terá outro hash.
+
+### 7.3. Abrir no Wireshark
+
+Pare qualquer captura ao vivo e selecione **Arquivo → Abrir**:
+
+```text
+C:\Users\eduar\Downloads\cyberlab-wlan.pcap
+```
+
+Use os números dos pacotes informados pelo analisador para montar o filtro:
+
+```text
+frame.number == "SYN" || frame.number == "SYNACK" || frame.number == "ACK"
+```
+
+**Substitua os marcadores entre aspas pelos números da execução atual, retirando as aspas.**
+
+Exemplo da captura anterior:
+
+```wireshark
+frame.number == 336 || frame.number == 359 || frame.number == 361
+```
+
+Confira a sequência **SYN → SYN/ACK → ACK**, os IPs e a porta de destino.
+
+**Em cada nova execução, podem mudar o nome da pasta, o hash e os números dos pacotes.** O Wireshark deve abrir exatamente a cópia do PCAP analisado na etapa 5.
 ### Validação do experimento pela Wi-Fi
 
 Um segundo experimento utilizou o Raspberry para realizar uma varredura autorizada do notebook conectado ao mesmo hotspot.

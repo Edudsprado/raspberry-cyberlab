@@ -406,10 +406,10 @@ A contribuição acadêmica consiste em implementar a correlação dos pacotes T
 raspberry-cyberlab/
 ├── README.md                 # Explicação e roteiro da demonstração
 ├── analyzer.py               # Analisador completo
-├── demonstrar.sh             # Demonstração automatizada do experimento original
+├── demonstrar.sh             # Executa testes e analisa o PCAP Wi-Fi configurado
 ├── tests/
 │   ├── __init__.py
-│   └── test_analyzer.py       # Testes automatizados
+│   └── test_analyzer.py       # Casos de teste do analisador
 ├── docs/
 │   ├── relatorio.md          # Relatório acadêmico
 │   ├── arquitetura.png
@@ -417,22 +417,24 @@ raspberry-cyberlab/
 │   ├── investigacao-forense.png
 │   ├── conferencia-wireshark.png
 │   └── testes-e-validacao.png
-├── .gitignore                # Exclui capturas, resultados e caches do Git
+├── .gitignore                # Mantém capturas, resultados e caches fora do Git
 └── .gitattributes            # Padroniza as terminações de linha
 ```
 
+O `demonstrar.sh` chama os testes definidos em `tests/test_analyzer.py` e depois executa o `analyzer.py`. Cada arquivo possui uma responsabilidade.
+
 ### Dados locais no Raspberry
 
-As capturas e os resultados ficam separados do código distribuído no GitHub.
+A estrutura abaixo representa a organização dos arquivos de trabalho. Os sufixos `XXXXXX` variam conforme a execução.
 
 ```text
 /home/cyber/Cyberlab/
 ├── capturas/
-│   ├── expermiremnto-nmap.pcap
+│   ├── expermiremnto-nmap.pcap    # Captura original usada nos testes
 │   ├── teste-inicial.pcap
-│   └── wlan.1nBw2Q/
+│   └── wlan.XXXXXX/              # Pasta de uma coleta Wi-Fi
 │       ├── captura.pcap
-│       └── relatorios/
+│       └── relatorios/           # Saída da análise direta
 │           ├── relatorio.json
 │           ├── portas.csv
 │           ├── tentativas.csv
@@ -441,22 +443,30 @@ As capturas e os resultados ficam separados do código distribuído no GitHub.
 │   └── SHA256SUMS.txt
 ├── relatorios/
 │   ├── ambiento01.txt
-│   └── nmap-local.txt
+│   ├── nmap-local.txt
+│   └── nmap-wlan.XXXXXX          # Saída salva de uma nova varredura
 └── raspberry-cyberlab/
+    ├── README.md
     ├── analyzer.py
     ├── demonstrar.sh
     ├── tests/
     ├── docs/
     └── relatorios-demonstracao.XXXXXX/
+        ├── testes.log
+        ├── analise.log
+        ├── relatorio.json
+        ├── portas.csv
+        ├── tentativas.csv
+        └── fluxos-tcp.csv
 ```
 
-A pasta `relatorios` também pode reunir os quatro relatórios da primeira validação, após a transferência da antiga pasta `relatorios-raspberry-01`.
+A pasta `relatorios` também pode conter os quatro relatórios preservados da primeira validação.
 
-Cada nova coleta cria uma pasta própria em `capturas`. Cada execução do `demonstrar.sh` cria uma pasta de resultados dentro do repositório local. Os nomes com sufixo variável distinguem as execuções e preservam os arquivos anteriores.
+A análise direta salva os relatórios no caminho informado em `--output-dir`. Já o `demonstrar.sh` cria uma pasta própria dentro do repositório local, preservando os resultados anteriores.
 
-O `SHA256SUMS.txt` existente registra os arquivos do experimento original; a nova captura possui seu hash registrado no respectivo `relatorio.json`.
+O `SHA256SUMS.txt` registra hashes dos arquivos do experimento original. Cada nova análise registra o hash de sua captura no respectivo `relatorio.json`.
 
-As capturas, os relatórios gerados e os logs locais não são baixados pelo `git clone`.
+As capturas, os relatórios gerados e os logs locais não acompanham o `git clone`. A captura Wi-Fi configurada no script deve ser disponibilizada separadamente.
 
 ## 10. Autor do repositório
 

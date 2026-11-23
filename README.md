@@ -103,17 +103,14 @@ Os endereços podem mudar após uma reconexão. Antes de repetir o experimento, 
 
 ### 5.2. Iniciar a captura
 
-No primeiro terminal do Raspberry, crie uma pasta exclusiva para a execução:
+No primeiro terminal do Raspberry:
 
 ```bash
 execucao=$(mktemp -d "$HOME/Cyberlab/capturas/wlan.XXXXXX")
-```
-
-Inicie a captura do tráfego TCP envolvendo o notebook:
-
-```bash
+printf 'Pasta da execução: %s\n' "$execucao"
 sudo tcpdump -i wlan0 -nn -s 0 -U -w "$execucao/captura.pcap" 'tcp and host 10.159.233.136'
 ```
+A pasta capturas já existe. O mktemp cria somente uma subpasta exclusiva para esta execução, preservando as capturas anteriores.
 
 Mantenha esse terminal aberto e capturando.
 
@@ -122,7 +119,9 @@ Mantenha esse terminal aberto e capturando.
 Em um **segundo terminal conectado ao Raspberry**, execute:
 
 ```bash
-nmap -sT -Pn -p 1-1000 --reason 10.159.233.136
+registro=$(mktemp "$HOME/Cyberlab/relatorios/nmap-wlan.XXXXXX")
+nmap -sT -Pn -p 1-1000 --reason -oN "$registro" 10.159.233.136
+printf '\nRegistro do Nmap: %s\n' "$registro"
 ```
 
 O comando realiza uma varredura TCP Connect das portas 1 a 1000 do notebook e apresenta o motivo de cada classificação.

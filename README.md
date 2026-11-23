@@ -21,23 +21,45 @@ A demonstração utiliza uma captura já coletada no laboratório. Sua execuçã
 
 ## 2. Arquitetura do laboratório
 
-### Experimento local
+### Topologia do laboratório
 
-![Diagrama Experimento local no Ilograph, do Raspberry Pi 3 à cópia do PCAP no Windows](docs/arquitetura.png)
+![Raspberry e notebook conectados ao hotspot, com varredura Nmap das portas TCP de 1 a 1000](docs/arquitetura.png)
 
-O PCAP contém 2.002 pacotes TCP em loopback (`127.0.0.1`). O arquivo foi copiado para o Windows via SCP, e o SHA-256 da cópia coincidiu com o do original.
+O Raspberry Pi 3 e o notebook estão conectados ao mesmo hotspot próprio. O Raspberry utiliza a interface `wlan0` e executa a varredura autorizada contra o notebook.
 
-### Investigação forense
+Na execução registrada, os IPs eram `10.159.233.58` (Raspberry) e `10.159.233.136` (notebook), na rede `10.159.233.0/24`. Confirme os endereços antes de repetir o experimento.
 
-![Diagrama do fluxo de análise do PCAP com Python e Wireshark, com relatórios JSON e CSV](docs/investigacao-forense.png)
+### Varredura e coleta
 
-O `analyzer.py` lê o PCAP e gera relatórios em JSON e CSV. No Wireshark, a conferência visual usa os pacotes das portas 22 e 23.
+![Nmap realiza as tentativas contra o notebook enquanto o tcpdump grava o PCAP no Raspberry](docs/varredura-e-coleta.png)
 
-### Testes e validação
+O Nmap executa uma varredura TCP Connect das portas 1 a 1000. Em paralelo, o tcpdump registra na `wlan0` os pacotes TCP envolvendo o notebook e salva a captura em PCAP.
 
-![Diagrama dos testes com capturas sintéticas e PCAP real, da conferência com TShark à comparação de relatórios entre Windows e Raspberry](docs/testes-e-validacao.png)
+A coleta começa antes da varredura e termina depois dela. O filtro inclui as duas direções da comunicação e pode registrar outras conexões entre os equipamentos.
 
-A suíte usa capturas sintéticas e o PCAP real. O TShark serviu de referência independente no Windows, e os três CSVs gerados nas execuções comparadas foram idênticos nos dois sistemas.
+### Análise forense
+
+![PCAP lido pelo analisador Python no Raspberry, gerando relatório JSON e relatórios CSV](docs/investigacao-forense.png)
+
+O `analyzer.py` é executado no Raspberry. Ele lê o PCAP, calcula SHA-256 e correlaciona as tentativas TCP por IPs, portas, direção, flags e números de sequência e confirmação.
+
+A análise gera `relatorio.json`, `portas.csv`, `tentativas.csv` e `fluxos-tcp.csv`, com referências aos pacotes que sustentam as classificações.
+
+### Conferência no Wireshark
+
+![PCAP transferido por SCP para o notebook, com comparação de SHA-256 e conferência visual no Wireshark](docs/conferencia-wireshark.png)
+
+Uma cópia do mesmo PCAP é transferida ao notebook via SCP. O hash calculado com `Get-FileHash` deve coincidir com o registrado pelo analisador.
+
+O arquivo salvo é aberto no Wireshark para conferir os pacotes indicados nos relatórios. Em cada nova execução, o nome da pasta, o hash e os números dos pacotes podem mudar.
+
+### Testes e automação
+
+![demonstrar.sh executa os testes automatizados e chama o analisador para a captura Wi-Fi configurada](docs/testes-e-validacao.png)
+
+O `demonstrar.sh` executa a suíte de testes e chama o analisador sobre a captura Wi-Fi configurada. Os testes de regressão usam separadamente a captura original de loopback e casos sintéticos.
+
+O script não executa Nmap nem tcpdump. Na versão preparada para o experimento, o caminho e o hash esperado são fixos; uma nova captura exige ajustar essa configuração ou executar `analyzer.py` diretamente. Os filtros de consulta alteram apenas a tabela exibida, mantendo os relatórios completos.
 
 ## 3. Ferramentas utilizadas
 
@@ -391,7 +413,9 @@ raspberry-cyberlab/
 ├── docs/
 │   ├── relatorio.md          # Relatório acadêmico
 │   ├── arquitetura.png
+│   ├── varredura-e-coleta.png
 │   ├── investigacao-forense.png
+│   ├── conferencia-wireshark.png
 │   └── testes-e-validacao.png
 ├── .gitignore                # Exclui capturas, resultados e caches do Git
 └── .gitattributes            # Padroniza as terminações de linha

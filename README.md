@@ -69,7 +69,7 @@ O script não executa Nmap nem tcpdump. Na versão preparada para o experimento,
 | Debian GNU/Linux 13 e Python 3.13.5 | Ambiente consultado no Raspberry |
 | Python 3.10 ou superior | Executar o analisador com a biblioteca padrão, sem instalar pacotes |
 | Nmap e tcpdump | Ferramentas associadas ao experimento de reconhecimento e captura |
-| Wireshark / TShark | Inspecionar os pacotes e comparar os resultados |
+| Wireshark | Inspecionar os pacotes e comparar os resultados |
 | Windows com Python 3.12.3 | Ambiente usado no desenvolvimento e na validação direta |
 
 Os comandos originais do Nmap e do tcpdump que produziram o PCAP principal não foram recuperados. O modelo e as versões do Raspberry foram fornecidos por transcrições de terminal na coleta complementar.
@@ -295,7 +295,7 @@ Os testes estão em **[tests/test_analyzer.py](tests/test_analyzer.py)** e verif
 - Arquivos inválidos ou truncados.
 - Cálculo de SHA-256 e geração dos relatórios.
 - Resultados esperados da captura original.
-- Comparação independente com TShark, quando disponível.
+- Comparação independente com wireshark.
 
 Execute os comandos na pasta do repositório.
 

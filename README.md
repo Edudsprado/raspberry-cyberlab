@@ -277,11 +277,11 @@ Os testes estão em **[tests/test_analyzer.py](tests/test_analyzer.py)** e verif
 
 Execute os comandos na pasta do repositório.
 
-## 7. Conferência no Wireshark
+## 7.1 Conferência no Wireshark
 
 Após concluir a etapa 5, transfira o PCAP gerado para o notebook e confira as evidências no Wireshark.
 
-### 7.1. Copiar a captura
+### 7.2 Copiar a captura
 
 No **PowerShell do notebook**, informe a pasta da execução:
 
@@ -299,7 +299,7 @@ scp "cyber@10.159.233.58:/home/cyber/Cyberlab/capturas/$pasta/captura.pcap" "$HO
 
 Digite a senha do Raspberry. Se o IP dele mudar, substitua também `10.159.233.58`.
 
-### 7.2. Conferir o hash
+### 7.3 Conferir o hash
 
 ```powershell
 Get-FileHash "$HOME\Downloads\cyberlab-wlan.pcap" -Algorithm SHA256
@@ -309,7 +309,7 @@ Compare o resultado com o SHA-256 apresentado pelo analisador na etapa 5. **Os v
 
 Uma nova captura normalmente terá outro hash.
 
-### 7.3. Abrir no Wireshark
+### 7.4. Abrir no Wireshark
 
 Pare qualquer captura ao vivo e selecione **Arquivo → Abrir**:
 

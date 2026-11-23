@@ -375,28 +375,36 @@ Essa análise foi executada diretamente com `analyzer.py`. O `demonstrar.sh` per
 
 ## 8. Limitações e conclusão
 
-A versão 0.1.0 oferece suporte a **PCAP clássico e TCP/IPv4**. Ela não lê PCAPNG ou IPv6, não remonta fragmentos e não valida checksums ou autenticações de aplicação.
+A versão 0.1.0 analisa **PCAP clássico e TCP/IPv4**. Não oferece suporte direto a PCAPNG ou IPv6, não remonta fragmentos IP e não valida checksums, autenticações ou conteúdo de aplicações.
 
-As classificações descrevem os padrões registrados na captura:
+As classificações dependem dos pacotes disponíveis e das regras de correlação:
 
-- Um handshake completo evidencia uma conexão estabelecida.
-- Um RST/ACK compatível em resposta ao SYN evidencia uma tentativa recusada.
-- A ausência de resposta correlacionada não comprova, isoladamente, bloqueio por firewall.
+- **SYN → SYN/ACK → ACK**, com direção e SEQ/ACK compatíveis: evidência de handshake completo.
+- **SYN → RST/ACK**, com resposta compatível: evidência de tentativa recusada.
+- **Sequência incompleta:** informação insuficiente para confirmar abertura ou fechamento.
 
-Os resultados não garantem o estado atual das portas nem identificam, sozinhos, os serviços executados. Uma conexão na porta 22 não comprova login SSH. Os nomes de serviços apresentados pelo Nmap na varredura realizada são associações às portas, sem confirmação de versões.
+Pacotes ausentes, captura iniciada depois da conexão e limitações temporais podem afetar a interpretação. Ausência de resposta correlacionada não comprova, sozinha, bloqueio por firewall.
 
-O SHA-256 permite comparar o conteúdo dos arquivos e detectar alterações, mas não comprova sozinho sua origem.
+Os resultados descrevem o tráfego observado naquele momento. Não garantem o estado atual das portas, não confirmam versões de serviços e não demonstram vulnerabilidade ou invasão. Um handshake na porta 22 não comprova autenticação SSH.
 
-O projeto foi aplicado em dois cenários:
+O filtro de captura inclui as duas direções da comunicação. Assim, conexões de administração entre o notebook e o Raspberry podem aparecer junto à varredura. É necessário considerar origem e destino ao comparar os resultados com o Nmap.
 
-| Experimento | Escopo |
+### Cenários utilizados
+
+| Experimento | Finalidade |
 | --- | --- |
-| Captura original | Tráfego local em `127.0.0.1`, validado no Windows e no Raspberry |
-| Captura pela Wi-Fi | Varredura TCP Connect do notebook pelo hotspot, com captura na `wlan0` |
+| Captura original em `127.0.0.1` | Referência conhecida para os testes de regressão |
+| Captura Wi-Fi pela `wlan0` | Análise da varredura autorizada do notebook pelo hotspot |
 
-Foi recuperado um registro de execução do Nmap relacionado ao experimento local, mas sua correspondência exata com a captura original não foi comprovada. O comando de captura original também permanece não confirmado. No experimento pela Wi-Fi, os comandos e a interface utilizados foram registrados durante a execução.
+Na execução Wi-Fi de 23/11/2026, as portas abertas do notebook identificadas pelo CyberLab coincidiram com o Nmap: **135, 139 e 445**. A tentativa aberta adicional teve o Raspberry como destino, na porta 22.
 
-A contribuição acadêmica consiste em implementar a correlação dos pacotes TCP, apresentar evidências para as classificações e comparar os resultados com ferramentas existentes.
+Uma nova execução pode produzir outros resultados, hashes e números de pacotes. Para a conferência no Wireshark, deve-se abrir uma cópia do mesmo PCAP analisado e utilizar as referências daquela execução.
+
+O SHA-256 permite comparar o conteúdo da cópia com o arquivo analisado, mas não comprova sozinho sua origem nem estabelece uma cadeia de custódia completa.
+
+O `demonstrar.sh` automatiza os testes e a análise de uma captura configurada. Ele não executa uma nova varredura nem inicia a captura de tráfego.
+
+A contribuição acadêmica do projeto é implementar a correlação TCP, organizar os resultados e relacionar cada classificação às suas evidências. A comparação com o Nmap e a conferência de sequências no Wireshark apoiam a avaliação, dentro do escopo e dos casos examinados.
 
 ## 9. Organização do repositório
 

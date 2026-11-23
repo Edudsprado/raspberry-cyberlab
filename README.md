@@ -158,7 +158,7 @@ Compare essa saída com as portas abertas informadas pelo Nmap.
 
 Os resultados de uma nova execução dependem dos serviços ativos, das regras de firewall e das condições da rede naquele momento.
 
-### 5.6. Resultados do experimento realizado
+### 5.6. Resultados do experimento realizado anteriormente
 
 O Nmap apresentou:
 
